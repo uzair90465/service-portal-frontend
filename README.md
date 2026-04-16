@@ -2,6 +2,11 @@
 
 This is a full-stack service portal application.
 
+## Project Structure
+
+- `backend/` - ASP.NET Core backend (SoftSolutions)
+- `frontend/` - React frontend built with Vite
+
 ## Backend
 
 The backend is built with ASP.NET Core (SoftSolutions).
@@ -9,6 +14,15 @@ The backend is built with ASP.NET Core (SoftSolutions).
 ## Frontend
 
 The frontend is built with React and Vite.
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
