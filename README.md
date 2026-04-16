@@ -1,4 +1,14 @@
-# React + Vite
+# Service Portal
+
+This is a full-stack service portal application.
+
+## Backend
+
+The backend is built with ASP.NET Core (SoftSolutions).
+
+## Frontend
+
+The frontend is built with React and Vite.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
