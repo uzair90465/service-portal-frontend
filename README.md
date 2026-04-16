@@ -1,19 +1,28 @@
-# Service Portal
+# Service Portal Frontend
 
-This is a full-stack service portal application.
+This is the frontend for the service portal application, built with React and Vite.
 
-## Project Structure
+## Getting Started
 
-- `backend/` - ASP.NET Core backend (SoftSolutions)
-- `frontend/` - React frontend built with Vite
+### Prerequisites
+- Node.js
+- npm
+
+### Installation
+```bash
+npm install
+```
+
+### Running the App
+```bash
+npm run dev
+```
+
+The app will run on http://localhost:3000
 
 ## Backend
 
-The backend is built with ASP.NET Core (SoftSolutions).
-
-## Frontend
-
-The frontend is built with React and Vite.
+The backend is a separate ASP.NET Core project running on https://localhost:7002
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
