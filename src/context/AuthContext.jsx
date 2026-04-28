@@ -6,12 +6,10 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const stored = localStorage.getItem('currentUser')
-      const token = localStorage.getItem('token')
-      if (stored && token) {
-        return JSON.parse(stored)
-      }
-      return null
+      const stored = sessionStorage.getItem('currentUser')
+      const token = sessionStorage.getItem('token')
+      if (!stored || !token) return null
+      return JSON.parse(stored)
     } catch {
       return null
     }
@@ -20,23 +18,21 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const res = await axiosInstance.post('/Auth/login', { email, password })
     const data = res.data
-
     const user = {
       id: data.id,
       name: data.name,
       email: data.email,
       role: data.role
     }
-
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('currentUser', JSON.stringify(user))
+    sessionStorage.setItem('token', data.token)
+    sessionStorage.setItem('currentUser', JSON.stringify(user))
     setCurrentUser(user)
     return user
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('currentUser')
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('currentUser')
     setCurrentUser(null)
   }
 

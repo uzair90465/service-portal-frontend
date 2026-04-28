@@ -14,18 +14,20 @@ export default function LoginPage() {
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' })
-const handleLogin = async (e) => {
-  e.preventDefault()
-  setLoading(true)
-  setError('')
-  try {
-    await login(loginForm.email, loginForm.password)
-    window.location.href = '/'  // navigate ki jagah ye
-  } catch (err) {
-    setError('Invalid email or password')
-    setLoading(false)
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      await login(loginForm.email, loginForm.password)
+      window.location.href = '/'  // navigate ki jagah ye
+    } catch (err) {
+      console.error('Login error:', err)
+      setError(err.message || 'Invalid email or password')
+      setLoading(false)
+    }
   }
-}
 
   const handleRegister = async (e) => {
     e.preventDefault()

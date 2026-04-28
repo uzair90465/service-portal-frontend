@@ -1,6 +1,5 @@
 import axiosInstance from './axiosInstance'
 
-// dashboardApi.js
 export const getDashboardStats = async () => {
   try {
     const [users, services, requests, orders, reviews, providers, locations, categories] = 
@@ -28,5 +27,40 @@ export const getDashboardStats = async () => {
   } catch (err) {
     console.error('Dashboard error:', err)
     return { users: 0, services: 0, requests: 0, orders: 0, reviews: 0, providers: 0, locations: 0, categories: 0 }
+  }
+}
+
+export const getProviderDashboardStats = async (providerId) => {
+  try {
+    const [requests, orders] = await Promise.allSettled([
+      axiosInstance.get(`/ServiceRequest/provider/${providerId}`),
+      axiosInstance.get(`/Orders/provider/${providerId}`),
+    ])
+
+    return {
+      requests: requests.status === 'fulfilled' ? requests.value.data?.length : 0,
+      orders:   orders.status === 'fulfilled'   ? orders.value.data?.length   : 0,
+    }
+  } catch (err) {
+    console.error('Provider dashboard error:', err)
+    return { requests: 0, orders: 0 }
+  }
+}
+
+export const getUserDashboardStats = async (userId) => {
+  try {
+    const [requests, orders] = await Promise.allSettled([
+      axiosInstance.get(`/ServiceRequest/user/${userId}`),
+      axiosInstance.get(`/Orders/user/${userId}`),
+    ])
+
+    return {
+      requests: requests.status === 'fulfilled' ? requests.value.data?.length : 0,
+      orders:   orders.status === 'fulfilled'   ? orders.value.data?.length   : 0,
+      reviews:  0,
+    }
+  } catch (err) {
+    console.error('User dashboard error:', err)
+    return { requests: 0, orders: 0, reviews: 0 }
   }
 }

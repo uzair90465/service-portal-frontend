@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { getAllOrders, getOrdersByUser, updateOrderStatus, completeOrder, deleteOrder } from '../api/ordersApi'
+import { getAllOrders, getOrdersByUser, getOrdersByProvider, updateOrderStatus, completeOrder, deleteOrder } from '../api/ordersApi'
 import { useAuth } from '../context/AuthContext'
 
 const STATUS_COLORS = {
@@ -38,7 +38,7 @@ export default function OrdersPage() {
       } else if (role === 'User') {
         data = await getOrdersByUser(currentUser.id)
       } else if (role === 'Provider') {
-        data = await getAllOrders()
+        data = await getOrdersByProvider(currentUser.id)
       }
       setOrders(Array.isArray(data) ? data : [])
     } catch (err) {
@@ -57,7 +57,7 @@ export default function OrdersPage() {
       showMsg('Order completed!')
       fetchOrders()
     } catch (err) {
-      showMsg(err.message || 'Failed', 'error')
+      showMsg(err?.message || 'Failed', 'error')
     } finally {
       setSaving(false)
     }
@@ -89,8 +89,6 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 min-h-screen bg-[#0F172A]">
-
-      {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -102,7 +100,6 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-md">
         <table className="w-full text-left border-collapse">
           <thead className="bg-slate-900/50">
@@ -182,7 +179,6 @@ export default function OrdersPage() {
         </table>
       </div>
 
-      {/* Toast */}
       {message && (
         <div className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl text-white font-semibold shadow-xl z-50 ${
           message.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'

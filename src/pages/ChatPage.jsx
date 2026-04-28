@@ -4,6 +4,7 @@ import { getRequestsByUser, getRequestsForProvider } from '../api/serviceRequest
 import { getOffersByRequest } from '../api/requestOfferApi'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import axiosInstance from '../api/axiosInstance'
 
 export default function ChatPage() {
   const [searchParams] = useSearchParams()
@@ -28,7 +29,7 @@ export default function ChatPage() {
     setTimeout(() => setMessage(null), 3000)
   }
 
-  // Load user's requests for dropdown
+  // Load requests for dropdown
   useEffect(() => {
     const loadRequests = async () => {
       try {
@@ -36,7 +37,23 @@ export default function ChatPage() {
         if (role === 'User') {
           data = await getRequestsByUser(senderId)
         } else if (role === 'Provider') {
-          data = await getRequestsForProvider(senderId)
+          // Pending matching requests
+          const pending = await getRequestsForProvider(senderId)
+          // Accepted/InProgress requests bhi load karo
+          try {
+            const allRes = await axiosInstance.get('/ServiceRequest')
+            const acceptedOrInProgress = Array.isArray(allRes.data)
+              ? allRes.data.filter(r =>
+                  r.status === 'Accepted' || r.status === 'InProgress'
+                )
+              : []
+            // Duplicates hata do
+            const pendingIds = Array.isArray(pending) ? pending.map(r => r.id) : []
+            const newOnes = acceptedOrInProgress.filter(r => !pendingIds.includes(r.id))
+            data = [...(Array.isArray(pending) ? pending : []), ...newOnes]
+          } catch {
+            data = Array.isArray(pending) ? pending : []
+          }
         }
         setRequests(Array.isArray(data) ? data : [])
       } catch (err) {
@@ -72,6 +89,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (started) fetchMessages()
+    // Auto refresh messages every 5 seconds
+    if (started) {
+      const interval = setInterval(fetchMessages, 5000)
+      return () => clearInterval(interval)
+    }
   }, [fetchMessages, started])
 
   useEffect(() => {
@@ -85,7 +107,6 @@ export default function ChatPage() {
     setSelectedRequest(req)
 
     if (role === 'User') {
-      // Find accepted offer to get provider ID
       try {
         const offers = await getOffersByRequest(reqId)
         const accepted = Array.isArray(offers) ? offers.find(o => o.status === 'Accepted') : null
@@ -98,7 +119,6 @@ export default function ChatPage() {
         setReceiverId('')
       }
     } else if (role === 'Provider') {
-      // Get userId from request
       if (req?.userId) {
         setReceiverId(req.userId)
       }
@@ -153,14 +173,12 @@ export default function ChatPage() {
         </p>
       </div>
 
-      {/* Request Selection — show if not started */}
+      {/* Request Selection */}
       {!started && (
         <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-8 max-w-lg mb-6">
           <h2 className="text-lg font-bold text-white mb-2">Start a Conversation</h2>
           <p className="text-slate-400 text-sm mb-6">Select a service request to start chatting</p>
           <form onSubmit={handleStart} className="space-y-5">
-
-            {/* Request Dropdown */}
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">
                 {role === 'User' ? 'My Requests' : 'Available Requests'}
@@ -178,7 +196,6 @@ export default function ChatPage() {
               </select>
             </div>
 
-            {/* Receiver info — auto filled */}
             {requestId && (
               <div style={{
                 background: receiverId ? 'rgba(52,211,153,0.08)' : 'rgba(250,204,21,0.08)',
@@ -208,7 +225,6 @@ export default function ChatPage() {
       {/* Chat Box */}
       {started && (
         <>
-          {/* Info Bar */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <span className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-3 py-1 rounded-full text-xs font-medium">
@@ -228,7 +244,6 @@ export default function ChatPage() {
           <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-md flex flex-col"
             style={{ height: 'calc(100vh - 320px)' }}>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {loading ? (
                 <div className="text-center text-slate-500 py-10">Loading messages...</div>
@@ -259,7 +274,6 @@ export default function ChatPage() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
             <div className="border-t border-slate-700/50 p-4">
               <form onSubmit={handleSend} className="flex gap-3">
                 <input type="text" placeholder="Type a message..."

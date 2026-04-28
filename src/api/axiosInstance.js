@@ -1,17 +1,17 @@
 import axios from 'axios'
 
 const axiosInstance = axios.create({
-  baseURL: 'https://localhost:7002/api',
+  // Change this from localhost to your Render URL
+  baseURL: 'https://service-portal-backend-u0qf.onrender.com/api', 
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 10000,
 })
 
-// Request interceptor — token add karo
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -20,7 +20,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// Response interceptor — 401 pe logout nahi karo abhi
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { getDashboardStats } from '../api/dashboardApi'
+import { getDashboardStats, getProviderDashboardStats, getUserDashboardStats } from '../api/dashboardApi'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { getRequestsByUser } from '../api/serviceRequestApi'
 import { getAllServices } from '../api/servicesApi'
 import { getAllLocations } from '../api/locationsApi'
 import axiosInstance from '../api/axiosInstance'
@@ -31,14 +30,10 @@ export default function DashboardPage() {
         const data = await getDashboardStats()
         setStats(data)
       } else if (role === 'User') {
-        const requests = await getRequestsByUser(currentUser.id).catch(() => [])
-        setStats({
-          requests: Array.isArray(requests) ? requests.length : 0,
-          orders: 0,
-          reviews: 0,
-        })
+        const data = await getUserDashboardStats(currentUser.id)
+        setStats(data)
       } else if (role === 'Provider') {
-        const data = await getDashboardStats()
+        const data = await getProviderDashboardStats(currentUser.id)
         setStats(data)
       }
     } catch (err) {
@@ -73,9 +68,9 @@ export default function DashboardPage() {
         serviceIds: providerForm.selectedServices,
         locationIds: providerForm.selectedLocations,
       })
-      localStorage.setItem('token', res.data.token)
+      sessionStorage.setItem('token', res.data.token)
       const updatedUser = { ...currentUser, role: 'Provider' }
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+      sessionStorage.setItem('currentUser', JSON.stringify(updatedUser))
       alert('You are now a Provider! Please login again.')
       window.location.href = '/login'
     } catch (err) {
@@ -154,7 +149,7 @@ export default function DashboardPage() {
     { label: 'Check Reviews',    link: '/reviews',          color: 'yellow' },
     { label: 'Manage Users',     link: '/users',            color: 'sky' },
   ]
-  const USER_LINKS     = [
+  const USER_LINKS = [
     { label: 'New Request', link: '/service-requests', color: 'sky' },
     { label: 'My Orders',   link: '/orders',            color: 'emerald' },
     { label: 'My Reviews',  link: '/reviews',           color: 'yellow' },
@@ -170,8 +165,6 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 min-h-screen bg-[#0F172A]">
-
-      {/* Welcome */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">
           Welcome back, <span className="text-sky-400">{currentUser?.name}</span> 👋
@@ -247,7 +240,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Account Info */}
         <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
           <h2 className="text-white font-bold text-lg mb-4">Your Account</h2>
           <div className="flex items-center gap-4">
@@ -314,8 +306,6 @@ export default function DashboardPage() {
               Setup your provider profile to start receiving service requests
             </p>
             <form onSubmit={handleBecomeProvider} className="space-y-5">
-
-              {/* Experience */}
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-2">Years of Experience</label>
                 <input type="number" required min="0" placeholder="e.g. 5"
@@ -323,8 +313,6 @@ export default function DashboardPage() {
                   value={providerForm.experienceYears}
                   onChange={e => setProviderForm({ ...providerForm, experienceYears: e.target.value })} />
               </div>
-
-              {/* Availability */}
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-2">Availability</label>
                 <select
@@ -335,8 +323,6 @@ export default function DashboardPage() {
                   <option value="false">Not Available Right Now</option>
                 </select>
               </div>
-
-              {/* Services */}
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-2">
                   Select Your Services <span className="text-red-400">*</span>
@@ -367,8 +353,6 @@ export default function DashboardPage() {
                   </p>
                 )}
               </div>
-
-              {/* Locations */}
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-2">
                   Select Your Locations <span className="text-red-400">*</span>
@@ -399,8 +383,6 @@ export default function DashboardPage() {
                   </p>
                 )}
               </div>
-
-              {/* Warning */}
               <div style={{
                 background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)',
                 borderRadius: '12px', padding: '12px 16px'
@@ -409,8 +391,6 @@ export default function DashboardPage() {
                   ⚠️ After becoming a provider, you will be logged out and need to login again.
                 </p>
               </div>
-
-              {/* Buttons */}
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setProviderModal(false)}
                   className="flex-1 py-3 text-slate-400 hover:text-white transition-colors">

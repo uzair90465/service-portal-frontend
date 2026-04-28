@@ -29,3 +29,8 @@ export const deleteOrder = async (id) => {
   const res = await axiosInstance.delete(`/Orders/${id}`)
   return res.data
 }
+
+export const getOrdersByProvider = async (providerId) => {
+  const res = await axiosInstance.get(`/Orders/provider/${providerId}`)
+  return res.data
+}

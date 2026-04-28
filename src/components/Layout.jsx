@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { useAuth } from '../context/AuthContext'
+import NotificationBell from './NotificationBell'
 
 const PAGE_TITLES = {
   '/': 'Dashboard',
@@ -33,21 +34,19 @@ export default function Layout() {
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar */}
-        <header
-          style={{
-            height: '64px',
-            background: 'rgba(15,23,42,0.8)',
-            backdropFilter: 'blur(12px)',
-            borderBottom: '1px solid rgba(56,189,248,0.08)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 28px',
-            position: 'sticky',
-            top: 0,
-            zIndex: 5,
-          }}
-        >
+        <header style={{
+          height: '64px',
+          background: 'rgba(15,23,42,0.8)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(56,189,248,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 28px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 5,
+        }}>
           <div>
             <h1 style={{ fontSize: '17px', fontWeight: 600, color: '#F1F5F9', letterSpacing: '-0.3px' }}>
               {title}
@@ -57,25 +56,22 @@ export default function Layout() {
             </p>
           </div>
 
-          {/* User Info + Logout */}
+          {/* User Info + Bell + Logout */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #38BDF8, #0EA5E9)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '14px',
-                fontWeight: 700,
-                color: 'white',
-                flexShrink: 0,
-              }}
-            >
+
+            {/* Notification Bell */}
+            <NotificationBell />
+
+            {/* Avatar */}
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '50%',
+              background: 'linear-gradient(135deg, #38BDF8, #0EA5E9)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '14px', fontWeight: 700, color: 'white', flexShrink: 0,
+            }}>
               {currentUser?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
+
             <div>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#CBD5E1' }}>
                 {currentUser?.name || 'User'}
@@ -84,28 +80,18 @@ export default function Layout() {
                 {currentUser?.role || 'Guest'} — ID #{currentUser?.id}
               </div>
             </div>
-            <button
-              onClick={handleLogout}
+
+            <button onClick={handleLogout}
               style={{
                 marginLeft: '8px',
                 background: 'rgba(239,68,68,0.1)',
                 border: '1px solid rgba(239,68,68,0.2)',
-                color: '#F87171',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: 'pointer',
+                color: '#F87171', padding: '6px 14px', borderRadius: '8px',
+                fontSize: '12px', fontWeight: 600, cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'rgba(239,68,68,0.2)'
-                e.currentTarget.style.color = '#FCA5A5'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'rgba(239,68,68,0.1)'
-                e.currentTarget.style.color = '#F87171'
-              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.2)'; e.currentTarget.style.color = '#FCA5A5' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#F87171' }}
             >
               Logout
             </button>
